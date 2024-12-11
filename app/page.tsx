@@ -176,7 +176,7 @@ export default function Home() {
             >
               <FacebookShareButton
                 url={imageUrl}
-                quote="Check out this cool generated image!"
+                title="Check out this cool generated image!"
               >
                 <FacebookIcon size={40} round />
               </FacebookShareButton>

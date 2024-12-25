@@ -63,9 +63,7 @@ export default function Home() {
 
     const link = document.createElement("a");
     link.href = image;
-
-    const fileName = inputValue ? `${inputValue}.png` : "number-image.png";
-    link.download = fileName;
+    link.download = `${inputValue || "number-image"}.png`;
 
     link.click();
   };
@@ -214,7 +212,7 @@ export default function Home() {
           fontSize: "14px",
         }}
       >
-        © 2024 Image Generator App
+        © 2024 Image Generator App . Created by @helloasir
       </footer>
     </div>
   );

@@ -18,6 +18,16 @@ export default function Home() {
   const [inputValue, setInputValue] = useState<string>("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [imageUrl, setImageUrl] = useState<string>("");
+  const [colorMode, setColorMode] = useState<string>("single");
+
+  const getRandomColor = (): string => {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
 
   const handleGenerate = async (): Promise<void> => {
     if (!canvasRef.current) return;
@@ -41,14 +51,56 @@ export default function Home() {
 
       if (isNaN(Number(digit))) continue;
 
-      const img = new Image();
-      img.src = `/images/${digit}.png`;
-      await new Promise<void>((resolve) => {
-        img.onload = () => {
-          ctx.drawImage(img, i * digitWidth, 0, digitWidth, digitHeight);
-          resolve();
-        };
-      });
+      let color: string | CanvasGradient | null = null; // default to null
+
+      switch (colorMode) {
+        case "single":
+          color = "#3498db"; // Example single color
+          break;
+        case "multi":
+          color = getRandomColor();
+          break;
+        case "gradient":
+          const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+          gradient.addColorStop(0, getRandomColor());
+          gradient.addColorStop(1, getRandomColor());
+          color = gradient;
+          break;
+        case "none":
+          color = null; // No color, use predefined image
+          break;
+        default:
+          color = "#000";
+      }
+
+      if (color) {
+        // Draw shape with color
+        ctx.fillStyle = color;
+        const centerX = i * digitWidth + digitWidth / 2;
+        const centerY = digitHeight / 2;
+        const radius = digitHeight / 2;
+
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, true);
+        ctx.fill();
+
+        // Draw the digit
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '50px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(digit, centerX, centerY);
+      } else {
+        // Use predefined image
+        const img = new Image();
+        img.src = `/images/${digit}.png`;
+        await new Promise<void>((resolve) => {
+          img.onload = () => {
+            ctx.drawImage(img, i * digitWidth, 0, digitWidth, digitHeight);
+            resolve();
+          };
+        });
+      }
     }
 
     const url = canvas.toDataURL("image/png");
@@ -75,10 +127,10 @@ export default function Home() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "space-between",
-        height: "812px", // iPhone X height
-        maxWidth: "375px", // iPhone X width
+        // height: "812px", // iPhone X height
+        // maxWidth: "375px", // iPhone X width
         margin: "0 auto",
-        border: "1px solid #ccc",
+        // border: "1px solid #ccc",
         boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
       }}
     >
@@ -129,6 +181,44 @@ export default function Home() {
             marginBottom: "10px",
           }}
         />
+        <div style={{ marginBottom: "10px" }}>
+          <label>
+            <input
+              type="radio"
+              value="single"
+              checked={colorMode === "single"}
+              onChange={() => setColorMode("single")}
+            />
+            Single Color
+          </label>
+          <label style={{ marginLeft: "10px" }}>
+            <input
+              type="radio"
+              value="multi"
+              checked={colorMode === "multi"}
+              onChange={() => setColorMode("multi")}
+            />
+            Multi Color
+          </label>
+          {/* <label style={{ marginLeft: "10px" }}>
+            <input
+              type="radio"
+              value="gradient"
+              checked={colorMode === "gradient"}
+              onChange={() => setColorMode("gradient")}
+            />
+            Gradient
+          </label> */}
+          <label style={{ marginLeft: "10px" }}>
+            <input
+              type="radio"
+              value="none"
+              checked={colorMode === "none"}
+              onChange={() => setColorMode("none")}
+            />
+            Without Color
+          </label>
+        </div>
         <button
           onClick={handleGenerate}
           style={{
@@ -212,7 +302,7 @@ export default function Home() {
           fontSize: "14px",
         }}
       >
-        © 2024 Image Generator App . Created by @helloasir
+        © 2024 Image Generator App
       </footer>
     </div>
   );

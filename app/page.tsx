@@ -128,7 +128,7 @@ export default function Home() {
         alignItems: "center",
         justifyContent: "space-between",
         // height: "812px", // iPhone X height
-        // maxWidth: "375px", // iPhone X width
+       // maxWidth: "600px", // iPhone X width
         margin: "0 auto",
         // border: "1px solid #ccc",
         boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
